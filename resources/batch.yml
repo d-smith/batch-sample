@@ -1,0 +1,12 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Name: EnvName
+  Type: String
+
+Resources:
+
+  BatchEnv:
+    Type: AWS::Batch::ComputeEnvironment
+    Properties:
+      ComputeEnvironmentName: !Ref EnvName

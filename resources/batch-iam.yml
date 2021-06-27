@@ -1,0 +1,60 @@
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+  
+Resources:
+  BatchEnvRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${Stage}-batch-env-role
+      AssumeRolePolicyDocument:
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service: batch.amazonaws.com
+            Action: 'sts:AssumeRole'
+           
+# Policy components adopted  from BatchServiceRolePolicy
+
+  BatchEnvPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${Stage}-batch-env-policy
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:DescribeLogGroups
+              - iam:GetInstanceProfile
+              - iam:GetRole
+              - autoscaling:DescribeAccountLimits
+              - autoscaling:DescribeAutoScalingGroups
+              - autoscaling:DescribeLaunchConfigurations
+              - autoscaling:DescribeAutoScalingInstances
+              - ecs:DescribeClusters
+              - ecs:DescribeContainerInstances
+              - ecs:DescribeTaskDefinition
+              - ecs:DescribeTasks
+              - ecs:ListClusters
+              - ecs:ListContainerInstances
+              - ecs:ListTaskDefinitionFamilies
+              - ecs:ListTaskDefinitions
+              - ecs:ListTasks
+              - ecs:DeregisterTaskDefinition
+              - ecs:TagResource
+              - ecs:ListAccountSettings
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+            Resource: "arn:aws:logs:*:*:log-group:/aws/batch/job*"
+          - Effect: Allow
+            Action:
+              - logs:PutLogEvents
+            Resource: "arn:aws:logs:*:*:log-group:/aws/batch/job*:log-stream:*"
+
+      Roles:
+        - Ref: BatchEnvRole
